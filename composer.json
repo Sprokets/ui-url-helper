@@ -1,0 +1,17 @@
+{
+    "name": "sprokets/ui-url-helper",
+    "description": "generates URLs for UI assets",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Matthew Grosse",
+            "email": "matt@sprokets.net"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Sprokets\\UiUrlHelper\\": "src"
+        }
+    }
+}
