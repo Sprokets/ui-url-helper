@@ -6,26 +6,28 @@ class UiUrlHelper
 {
     protected $urlPrefix;
     protected $version;
-    protected $enableMinification;
-    protected $enableGzip;
+    protected $useMinifiedFiles;
+    protected $negotiateGzip;
+    protected $serveGz;
 
-    public function __construct($urlPrefix, $version, $enableMinification = false, $enableGzip = false)
+    public function __construct($urlPrefix, $version, $useMinifiedFiles = false, $negotiateGzip = false)
     {
         $this->urlPrefix = $urlPrefix;
         $this->version = $version;
-        $this->enableMinification = $enableMinification;
-        $this->enableGzip = $enableGzip;
+        $this->useMinifiedFiles = $useMinifiedFiles;
+        $this->negotiateGzip = $negotiateGzip;
     }
 
     public function getUrl($file)
     {
-        // check for minification and gzip
-        if ($this->enableMinification) {
+        if ($this->useMinifiedFiles) {
             $file = $this->minifyFilename($file);
         }
 
-        if ($this->enableGzip) {
-            $file = $this->gzipFilename($file);
+        if ($this->negotiateGzip) {
+            if ($this->canServeGzipped()) {
+                $file = $this->gzipFilename($file);
+            }
         }
 
         $url = implode('/', array($this->urlPrefix, $this->version, $file));
@@ -61,5 +63,17 @@ class UiUrlHelper
         }
 
         return $file;
+    }
+
+    protected function canServeGzipped()
+    {
+        if (is_bool($this->serveGz)) {
+            return $this->serveGz;
+        }
+
+        $acceptEncoding = getenv('HTTP_ACCEPT_ENCODING');
+        $this->serveGz = strpos($acceptEncoding, 'gzip') !== false;
+
+        return $this->serveGz;
     }
 }
